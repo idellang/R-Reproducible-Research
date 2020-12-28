@@ -1,0 +1,90 @@
+---
+title: "Week 2"
+author: "Me"
+date: "12/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Coding standards in R
+1. always use text editor. 
+2. indent your code
+3. limit width of your code
+4. Limit length of functions. 
+
+
+# Markdown
+- simplified markup language. Just focus on content
+- text to HTML conversion tool for web writers. Allows you to write using easy to read and write text format to valid XHTML or HTML
+
+Types
+*italics*
+**bold**
+##Headings
+- Unordered
+- List
+- Using hypen
+
+1. Ordered
+2. List
+3. Using numbers
+
+Links
+[Rstudio](http://www.rstudio.com)
+
+Advanced linking
+I spend so much time reading [R bloggers][1] and [Simply Statistics][2]!
+[1]: http://www.r-bloggers.com/ 'R bloggers'
+[2]: http://simplystatistics.org/ 'Simply Statistics'
+
+New lines are created after double space
+
+First Line
+
+Second Line
+
+
+# R markdown
+
+- integration of R code with markdown
+- Allows one to create documents containing 'live' R code
+- R code is evaluated is part of markdown
+- Results from R code are inserted into markdown document.
+- Core tool for literate statistical programming
+- can be converted to standard markdown using knitr package
+- markdown can be converted to html using markdown package.
+- any basic text editor can be used to create a markdown document.
+- R markdown -> markdown -> HTML workflow can be easily managed using R studio
+- R markdown can be converted to slides using slidify package.
+
+
+# R markdown demonstration
+
+
+This is an R markdown file
+
+Here we will load some data
+
+```{r}
+library(datasets)
+summary(airquality)
+```
+Let's first make a pairs plot of the data
+
+```{r}
+pairs(airquality)
+```
+
+Here's a regression model of ozone on wind and temperature
+
+```{r}
+fit = lm(Ozone ~ Wind + Solar.R + Temp, data = airquality)
+summary(fit)
+```
+
+
+
+
