@@ -85,6 +85,139 @@ fit = lm(Ozone ~ Wind + Solar.R + Temp, data = airquality)
 summary(fit)
 ```
 
+#Knitr
+
+- Authors must undertake considerable effort to put data/results on the web
+- readers must download data/results and piece together which data go with which code sections etc
+
+Literate Statistical programming
+- article is a stream of text and code
+- analysis of code is divided into code of chunks
+- presentation code formats results (tables, figures, etc)
+
+How do I make my work reproducible
+- decide to do it
+- keep track of things, perhaps with a version control
+- use software whose operation can be encoded
+- dont save output (save raw data and preprocessing code)
+- save data in non proprietary formats
+
+Pros of literate programming
+- text and code in one place
+- data, results automatically update to reflect external changes
+- code is live when buildign document
+
+Cons
+- can make documents hard to read, especially if there are a lot of codes
+- can slow down processing of documents.
+
+
+# What is knitr
+- supports Rmarkdown, latex, HTML as documentation language
+- can export PDF, HTML
+- built into Rstudio
+
+what is knitr good for?
+- manuals
+- short/medium length technical documents
+- tutorials
+- report
+- data preprocessing documents/ summaries
+
+
+Not good for
+- long research articles
+- complex time consuming computations
+- documents that require precise formatting. 
+
+
+Options
+echo = FALSE : means no code echoed
+results = 'hide' : hide results
+
+
+can also change figures 
+
+```{r scatterplot, fig.height=4}
+x = rnorm(100)
+y = x + rnorm(100, sd = .5)
+
+par(mar = c(5,4,1,1), las = 1)
+plot(x,y, main = 'Simulated data')
+```
+
+Making tables with xtable
+```{r}
+library(datasets)
+data("airquality")
+fit = lm(Ozone ~ Wind + Temp + Solar.R, data = airquality)
+```
+
+Here is a table of regression coefficients
+```{r}
+library(xtable)
+xt = xtable(summary(fit))
+print(xt)
+```
+
+Setting global options
+- apply settings to every code chunks
+
+```{r setoptions, echo = FALSE}
+opts_chunk$set(echo = FALSE, results = 'hide')
+```
+
+
+Some common options
+
+Output
+- results: asis, hide
+- echo : TRUE, FALSE
+
+Figures
+- fig.height : numeric
+- fig.width : numeric
+
+Caching computations
+- what if one chunk takes a long time to run?
+- all chunks have to be recomputed everytime you re-knit the file
+- cache = TRUE option can be set on chunk by chunk basis to store results
+- after first run, results are loaded from cache.
+
+Caching caveats
+- if the data or code changes, need to rerun cached code chunks
+- dependencies are not checked
+- chunks with side effects may not be cacheable
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
