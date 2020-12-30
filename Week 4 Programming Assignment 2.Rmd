@@ -1,0 +1,272 @@
+---
+title: "Analyzing NOAA's storm data"
+author: "Me"
+date: "12/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Title: Analyzing NOAA's storm data
+
+# Synopsis
+
+This assignment aims to explore and manipulate the  U.S. National Oceanic and Atmospheric Administration's (NOAA) storm data to answer the following questions:
+
+* Across the United States, which types of events are most harmful with respect to population health?
+* Across the United States, which types of events have the greatest economic consequences?
+
+### Summary
+
+We used the NOAA's storm data to identify the most damaging events to both human life and economic properties. We have identified that the storm is the deadliest event recording to a total of around 100,000 injuries and lives taken. For economic damage, flood has the highest property damage while drought has the highest crop damage
+
+
+# Data Exploration and Processing
+
+### Load data and libraries needed
+
+Load the libraries needed for data analysis
+```{r}
+library(tidyverse)
+library(janitor)
+library(ggplot2)
+library(patchwork)
+```
+
+
+Download the data from the given URL and upload it to R
+```{r}
+file_url = 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
+download.file(file_url, destfile = paste0(getwd(), '/data.csv.bz2'))
+data = data.table::fread('data.csv.bz2')
+```
+
+
+### Exploring the data
+
+Check the values on each column
+```{r}
+head(data[,1:5])
+```
+
+```{r}
+dim(data)
+```
+There are more than 900k rows and 37 columns.
+
+
+Check the columns
+```{r}
+colnames(data)
+```
+
+
+### Select appropriate columns
+
+Select only those columns that are needed
+```{r}
+cols_needed = c('EVTYPE', 'FATALITIES', 'INJURIES', "PROPDMG", 'PROPDMGEXP','CROPDMG', 'CROPDMGEXP')
+
+data = data[, ..cols_needed]
+data = clean_names(data)
+```
+Check structure of selected columns
+
+```{r}
+str(data)
+```
+
+
+### Format exponent data
+
+Let's format first hte property damage exponent and crop damage exponent
+
+There's a need to make property damage exponent and crop damage exponent fixed
+
+Make all upper case for property damage exponent and crop damage exponent
+```{r}
+data = data %>%
+      mutate(propdmgexp = toupper(propdmgexp),
+             cropdmgexp = toupper(cropdmgexp))
+```
+
+Convert letters to numbers
+```{r}
+data = data %>%
+     mutate(propdmgexp = case_when(propdmgexp == 'H' ~ '2',
+                                   propdmgexp == 'K' ~ '3',
+                                   propdmgexp == 'M' ~ '6',
+                                   propdmgexp == 'B' ~ '9',
+                                   TRUE ~ propdmgexp),
+            cropdmgexp = case_when(cropdmgexp == 'H' ~ '2',
+                                   cropdmgexp == 'K' ~ '3',
+                                   cropdmgexp == 'M' ~ '6',
+                                   cropdmgexp == 'B' ~ '9',
+                                   TRUE ~ cropdmgexp))
+```
+
+
+
+Convert to numeric and fill others with zero
+```{r}
+data = data %>%
+      mutate(propdmgexp = parse_number(propdmgexp),
+             cropdmgexp = parse_number(cropdmgexp))
+
+data[is.na(data$propdmgexp),'propdmgexp'] = 0
+data[is.na(data$cropdmgexp),'cropdmgexp'] = 0
+```
+
+```{r}
+
+data %>%
+      mutate(propdmg1 = propdmg * (10^propdmgexp), 
+             cropdmg1 = cropdmg * (10^ cropdmgexp))  %>%
+      arrange(desc(cropdmg))
+```
+
+### Calculate actual cost
+
+Calculate the actual property damage and crop damage
+```{r}
+data = data %>%
+      mutate(propdmg = propdmg * (10^propdmgexp), 
+             cropdmg = cropdmg * (10^cropdmgexp)) %>%
+      select(-propdmgexp, -cropdmgexp)
+```
+
+
+
+
+### Create dataframe for total health and total economic damages
+
+Create a column for health damage and economic damage by combininig number of fatalities and  injuries and property damage and crop damage
+```{r}
+health_economic = data %>%
+      mutate(health_damage = fatalities + injuries,
+             economic_damage = propdmg + cropdmg) %>%
+      select(evtype, health_damage, economic_damage)
+```
+
+### Create a dataframe for separate property damage and crop damage
+
+Combine the economic damage and create an identifier
+```{r}
+economic_damages = data %>%
+      gather(key = 'type', value = 'damage', propdmg, cropdmg) %>%
+      select(evtype, type, damage)
+```
+
+
+# Results
+
+### Question 1: Most frequent events
+
+```{r}
+graph1 = data %>%
+      mutate(evtype = fct_lump(evtype, 15)) %>%
+      count(evtype) %>%
+      mutate(evtype = fct_reorder(evtype, n)) %>%
+      ggplot(aes(evtype, n))+
+      geom_col(aes(fill = evtype)) +
+      coord_flip()+
+      labs(title = 'Occurences of natural events in the US',
+           subtitle = 'Hail is the most occuring natural event',
+           x = '',
+           y = 'count')+
+      scale_y_continuous(labels = scales::comma)+
+      theme_minimal()+
+      theme(legend.position = 'none')
+
+graph1
+```
+This first image presents the counts of natural events as recorded by U.S. National Oceanic and Atmospheric Administration's (NOAA)
+
+### Question2:  Deadliest events
+
+```{r}
+health_economic_total = health_economic %>%
+      mutate(evtype = factor(evtype)) %>%
+      group_by(evtype) %>%
+      summarise(health_damage = sum(health_damage, na.rm = TRUE),
+             economic_damage = sum(economic_damage, na.rm = TRUE))
+
+graph2 = health_economic_total %>%
+      arrange(desc(health_damage)) %>%
+      head(20) %>%
+      mutate(evtype = fct_reorder(evtype, health_damage)) %>%
+      ggplot(aes(evtype, health_damage))+
+      geom_col(aes(fill = evtype))+
+       coord_flip()+
+      labs(title = 'Deadliest events in the US',
+           subtitle = 'Tornado events recorded highest injury and fatality count',
+           x = '',
+           y = 'count of injuries/deaths')+
+      scale_y_continuous(labels = scales::comma)+
+      theme_minimal()+
+      theme(legend.position = 'none')
+
+graph2
+```
+
+### Question3: Most economically damaging events
+
+```{r}
+top10_property_damage = economic_damages %>%
+      mutate(evtype = factor(evtype), 
+             type = factor(type)) %>%
+      filter(type == 'propdmg') %>%
+      group_by(evtype) %>%
+      summarise(damage = sum(damage)) %>%
+      arrange(desc(damage)) %>%
+      head(10)
+      
+
+graph3 = ggplot(top10_property_damage, aes(x = reorder(evtype, damage), y = damage/10^6)) + 
+      geom_col(aes(fill = evtype))+
+      coord_flip()+
+      labs(title = 'Top 10 events with the economic damage',
+           subtitle = 'Property damage',
+           x = '',
+           y = '')+
+      scale_y_continuous(labels = scales::comma)+
+      theme_minimal()+
+      theme(legend.position = 'none')
+
+top10_crop_damage = economic_damages %>%
+      mutate(evtype = factor(evtype), 
+             type = factor(type)) %>%
+      filter(type == 'cropdmg') %>%
+      group_by(evtype) %>%
+      summarise(damage = sum(damage)) %>%
+      arrange(desc(damage)) %>%
+      head(10)
+
+graph4= ggplot(top10_crop_damage, aes(x = reorder(evtype, damage), y = damage/10^6)) + 
+      geom_col(aes(fill = evtype))+
+      coord_flip()+
+      labs(subtitle = 'Crop damage',
+           x = '',
+           y = 'cost (M)')+
+      scale_y_continuous(labels = scales::comma)+
+      theme_minimal()+
+      theme(legend.position = 'none')
+
+graph5 = graph3/graph4
+graph5
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

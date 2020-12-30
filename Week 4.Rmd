@@ -1,0 +1,66 @@
+---
+title: "Week 4"
+author: "Me"
+date: "12/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Caching computation
+
+cacher package in R
+- add-on package in R
+- evaluates code written in files and stores immediate results in a key value database
+- R expressions are given SHA-1 values so that changes can be tracked
+- 'cacher' package can be built for distribution
+- others can clone an analysis and evaluate subsets of code or inspect data objects
+
+using cacher as an author
+- parse R source file; create necessary cache directories and subdirectories
+- cycle through each expression in the source file
+      - if an expression has never been evaluated, evaluate it and store object in cache database
+      - if cache results exist, lazy-load results from cache database and move to next expression
+      - if an expression does not create any R objects, add expression to the list of expression where evaluation
+         is forced
+
+using cache as a reader
+```{r}
+library(cacher)
+clonecache(id = '092d')
+
+showfiles()
+
+source('top20.R')
+```
+
+
+Cloning an analysis
+- local directories are created
+- source code files and metadata are downloaded
+- data objects are not downloaded by default
+- references to data objects are loaded and corresponding data can be lazy loaded
+
+Running code
+- runcode function executes code in the source file
+- by default, expressions that results in an object are not run and the resulting objects is lazy loaded into the workspace.
+
+Checking code
+- check code function evaluates all expressions from scratch
+- results of evaluation are checked against stored results to see if results are the same as what authors calculated
+
+cacher summary
+- authors can create packages from data analyses for distribution
+- readers can use cacher package to inspect other data analyses by examining cache computations
+
+# Case study: Air pollution
+
+Identify harmful elements of air pollution.
+
+NMAPPS reproducibility
+- data are made available at the internet
+- research results and software are also available
+- many studies have been conducted based on the public data
+

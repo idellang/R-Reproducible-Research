@@ -1,0 +1,202 @@
+---
+title: "Week 3"
+author: "Me"
+date: "12/29/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Communicating results
+
+tldr
+- people are busy
+- results of data analysis are sometimes presented in oral form, but often via email
+- useful to breakdown results into different levels of granularity
+
+## Hierarchy of info
+
+Research
+- title
+- abstract
+- body/results
+- supplementary materials
+- code/ data/ details
+
+Email presentation
+- subject line/ sender info
+      - summarize findings in one sentence
+- email body
+      - brief description of problem; summarize findings 1-2 paragraphs
+      - action needs to be taken as result of presentation, suggest some options, make them concrete as possible
+      - if questions need to be addressed, try to make them yes/no
+- attachments
+      - r markdown file
+      - knitr report
+      - stay concise: dont spit out pages of code
+- links to supplementary materials
+      - code/ software/ data
+      - github repo/ project site
+
+# Rpubs
+
+R studio provides Rpubs
+- publish knitr or rmarkdown documents
+- knit html file
+- Publish 
+- add title, description, and identifier
+
+
+
+# Reproducible research checklist
+
+Do: Start with good science
+- garbabe in; garbage out
+- coherent, focused question simplifies many problems
+- working with good collaborators enforces good practices
+- something that's interesting to you will motivate good habits
+
+Dont: do things by hand
+- editing of spread sheets to clean it up
+      - remove outliers
+      - QA / QC
+      - validating
+- editing tables or figures (e.g rounding, formatting)
+- downloading data from web browser
+- moving data around your computer; splitting/ reformatting data files
+
+
+Dont: Point and click
+- many data processing/ statistical analysis have GUIs
+- GUI are convenient and intuitive but the actions are hard to reproduce
+- be careful with data analysis software that is highly interactive; ease of use can lead to non-reproducible analyses
+
+Do: teach a computer
+- need to write it down exactly what you mean to do and how it should be done
+- guarantees reproducibility
+- download directly to computer. 
+- code can always be executed as long as the link is available
+
+Do: use version control
+- slow things down
+- add changes in small chunks
+- track and revert to old version
+- easy to publish
+
+
+Do: Keep track of software environment
+- computer architecture: CPUs, GPUs
+- operating system: Windows, MAC
+- software toolchain : compilers, interpreters, programming language
+-  infrastructures: libraries, R packages, dependencies
+- external dependencies : web sites, data repositories, software repositories
+- version numbers (if available)
+
+```{r}
+sessionInfo()
+```
+
+
+Dont: Save output
+- avoid saving data analysis output except for temporarily efficiency purposes
+- save data + code that generated the output
+- immediate files are okay as long as there is a clear documentation. 
+
+
+Do: set your seed
+- let's stream of random numbers to be reproducible
+- always set the seed.
+
+
+Do: think about the entire pipeline
+- data analysis is lengthy process
+- raw data -> processed -> analysis -> report
+- how you got to the end is just important as the end
+- more data analysis pipeline you can make reproducible, the better for every one
+
+Summary checklist
+- are we doing good science?
+- was any part done by hand? 
+      - if so, are those parts documented?
+      - does documentation match reality
+- have we taught a computer to do as much as possible
+- are we using version control system?
+- have we documented our software environment?
+- have we saved any output that cannot be reconstructed using data and code
+- how far back in the analysis pipeline can we go before our results are no longer reproducible
+
+
+# Evidence based data analysis
+Replication
+- focuses on the validity of scientific claim
+- is this claim true?
+- standard for strengthening scientific evidence
+- important in studies that can impact broad policy or regulations
+
+reproducibility
+- validity of data analysis
+- can we trust this analysis?
+- minimum standard for scientific study
+- new investigators, same data, same methods
+
+Background and underlying trends
+- some studies cannot be replicated: no money, time , unique or opportunistic
+- technology is increeasing data collection, data are more complex
+
+The result?
+- even basic analyses are hard to describe
+- heavy computational requirements are thrust upon people without adequate training in stat and computing
+- errors are more easily introduced into long analysis of pipelines
+- knowledge transfer is inhibited
+- results are difficult to replicate or reproduce
+- complicated analyses cannot be trusted
+
+What problem does reproducibility solve?
+- transparency
+- data availability
+- methods availablility
+- improved transfer of knowledge
+
+What we do not get
+- validity, or correctness of analysis. 
+An analysis can be reproducible and still wrong
+
+Problems with reproducibility
+- addresses most downstream aspect of research process
+- assumes everyone plays by the same rules and wants to achieve same goals. 
+
+Who reproduces research?
+- someone needs to
+    - rerun analysis
+    - check code for bugs/errors
+    - try alternate approaches
+- who is someone and what are their goals?
+
+Evidence based analysis
+- most data analysis involve stringing together many tools and methods
+- some methods maybe standard in a given field. 
+- we should apply thoroughly studied (via statistical research), mutually agreed upon methods to analyze data whenver possible
+- there should be evidence to justify application of a given method. 
+-
+ Evidence based data analysis
+ - create analytic pipeline from evidence based components
+ - analysis with transparent box
+ - 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
